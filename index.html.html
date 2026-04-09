@@ -1,0 +1,462 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  .mpd{font-family:'Rajdhani',sans-serif;background:#0a0e14;color:#c8d0dc;min-height:100vh;padding:16px}
+  .mpd-header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1e2a38;padding-bottom:12px;margin-bottom:16px}
+  .mpd-logo{display:flex;align-items:center;gap:10px}
+  .mpd-badge{width:32px;height:32px;background:#1a2d42;border:1.5px solid #2e7daf;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#5bc4f0;font-family:'JetBrains Mono',monospace}
+  .mpd-title{font-size:20px;font-weight:700;letter-spacing:2px;color:#e8f0fa;text-transform:uppercase}
+  .mpd-live{display:flex;align-items:center;gap:6px;font-size:11px;font-family:'JetBrains Mono',monospace;color:#4ecb8a;letter-spacing:1px}
+  .mpd-dot{width:7px;height:7px;background:#4ecb8a;border-radius:50%;animation:blink 1.4s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .mpd-score-bar{display:flex;align-items:center;justify-content:center;gap:24px;background:#0d1520;border:1px solid #1e2a38;border-radius:8px;padding:10px 20px;margin-bottom:14px}
+  .mpd-team{text-align:center}
+  .mpd-team-name{font-size:13px;letter-spacing:2px;color:#7a9ab8;text-transform:uppercase;font-weight:600}
+  .mpd-team-score{font-size:36px;font-weight:700;color:#e8f0fa;font-family:'JetBrains Mono',monospace;line-height:1}
+  .mpd-match-info{text-align:center}
+  .mpd-match-min{font-size:22px;font-weight:700;color:#e8a020;font-family:'JetBrains Mono',monospace}
+  .mpd-match-label{font-size:10px;color:#4a6070;letter-spacing:2px;text-transform:uppercase}
+  .mpd-match-name{font-size:11px;color:#7a9ab8;margin-top:2px;letter-spacing:1px}
+  .mpd-filters{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+  .mpd-filter-label{font-size:11px;color:#4a6070;letter-spacing:2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
+  .mpd-select{background:#0d1520;border:1px solid #1e2a38;color:#c8d0dc;font-family:'Rajdhani',sans-serif;font-size:13px;padding:6px 10px;border-radius:5px;cursor:pointer;letter-spacing:1px}
+  .mpd-select:focus{outline:none;border-color:#2e7daf}
+  .mpd-btn{background:#0d1520;border:1px solid #1e2a38;color:#7a9ab8;font-family:'Rajdhani',sans-serif;font-size:12px;padding:6px 14px;border-radius:5px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+  .mpd-btn:hover,.mpd-btn.active{background:#1a2d42;border-color:#2e7daf;color:#5bc4f0}
+  .mpd-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+  .mpd-kpi{background:#0d1520;border:1px solid #1e2a38;border-radius:7px;padding:10px 14px;position:relative;overflow:hidden}
+  .mpd-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+  .mpd-kpi.xg::before{background:linear-gradient(90deg,#1a5a9a,#5bc4f0)}
+  .mpd-kpi.carries::before{background:linear-gradient(90deg,#1a6040,#4ecb8a)}
+  .mpd-kpi.shots::before{background:linear-gradient(90deg,#7a3a00,#e8a020)}
+  .mpd-kpi.pressure::before{background:linear-gradient(90deg,#6a1a3a,#d45080)}
+  .mpd-kpi-label{font-size:10px;color:#4a6070;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+  .mpd-kpi-val{font-size:28px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1}
+  .mpd-kpi.xg .mpd-kpi-val{color:#5bc4f0}
+  .mpd-kpi.carries .mpd-kpi-val{color:#4ecb8a}
+  .mpd-kpi.shots .mpd-kpi-val{color:#e8a020}
+  .mpd-kpi.pressure .mpd-kpi-val{color:#d45080}
+  .mpd-kpi-sub{font-size:11px;color:#4a6070;margin-top:2px;letter-spacing:.5px}
+  .mpd-callout{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#1a2d42;border:1px solid #2e7daf;border-radius:4px;padding:3px 7px;font-size:10px;color:#5bc4f0;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;white-space:nowrap}
+  .mpd-callout.up{color:#4ecb8a;border-color:#1a6040;background:#0d2018}
+  .mpd-callout.warn{color:#e8a020;border-color:#7a3a00;background:#1a1200}
+  .mpd-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .mpd-card{background:#0d1520;border:1px solid #1e2a38;border-radius:7px;padding:12px 14px}
+  .mpd-card-title{font-size:12px;color:#4a6070;letter-spacing:2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .mpd-card-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .dot-blue{background:#5bc4f0}.dot-green{background:#4ecb8a}.dot-amber{background:#e8a020}.dot-pink{background:#d45080}
+  .mpd-xg-chart{position:relative;width:100%;height:160px}
+  .mpd-player-list{display:flex;flex-direction:column;gap:7px}
+  .mpd-player-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:#0a0e14;border:1px solid transparent;border-radius:5px;cursor:pointer;transition:all .2s}
+  .mpd-player-row:hover,.mpd-player-row.selected{border-color:#2e7daf;background:#0f1a26}
+  .mpd-player-num{font-family:'JetBrains Mono',monospace;font-size:12px;color:#2e7daf;width:20px;text-align:center;font-weight:500}
+  .mpd-player-name{flex:1;font-size:14px;font-weight:600;color:#c8d0dc;letter-spacing:.5px}
+  .mpd-player-pos{font-size:10px;color:#4a6070;letter-spacing:1px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;width:28px}
+  .mpd-player-bar-wrap{width:80px;height:5px;background:#1e2a38;border-radius:3px;overflow:hidden}
+  .mpd-player-bar{height:100%;border-radius:3px;transition:width .5s ease}
+  .mpd-player-stat{font-size:12px;font-family:'JetBrains Mono',monospace;width:38px;text-align:right;font-weight:500}
+  .mpd-phase-grid{display:grid;grid-template-columns:1fr;gap:6px}
+  .mpd-phase-row{display:grid;grid-template-columns:80px 1fr 50px;align-items:center;gap:8px;font-size:12px}
+  .mpd-phase-name{color:#7a9ab8;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.5px}
+  .mpd-phase-track{height:6px;background:#1e2a38;border-radius:3px;overflow:hidden}
+  .mpd-phase-fill{height:100%;border-radius:3px;transition:width .6s ease}
+  .mpd-phase-val{font-size:11px;color:#c8d0dc;font-family:'JetBrains Mono',monospace;text-align:right}
+  .mpd-pitch{position:relative;width:100%;aspect-ratio:1.6;background:#0a1a0f;border:1px solid #1a3020;border-radius:6px;overflow:hidden}
+  .mpd-pitch-line{position:absolute;border:1px solid rgba(80,140,80,.3)}
+  .mpd-carries-canvas{width:100%;height:100%;position:absolute;top:0;left:0}
+  .mpd-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .mpd-momentum{position:relative;width:100%;height:60px}
+  .mpd-section-header{font-size:10px;color:#4a6070;letter-spacing:2px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #1e2a38}
+  .mpd-highlight-callout{background:#0f2030;border:1px solid #2e7daf;border-left:3px solid #5bc4f0;border-radius:0 6px 6px 0;padding:8px 12px;margin-top:8px;display:flex;align-items:center;gap:10px}
+  .mpd-hc-icon{font-size:18px;flex-shrink:0}
+  .mpd-hc-text{font-size:12px;color:#7a9ab8;line-height:1.4}
+  .mpd-hc-val{font-size:18px;font-weight:700;color:#5bc4f0;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+  .mpd-events{display:flex;flex-direction:column;gap:5px;max-height:160px;overflow-y:auto}
+  .mpd-event{display:flex;gap:8px;align-items:flex-start;padding:5px;border-radius:4px;font-size:12px}
+  .mpd-event-min{font-family:'JetBrains Mono',monospace;font-size:10px;color:#4a6070;min-width:28px}
+  .mpd-event-icon{font-size:13px;line-height:1.2;flex-shrink:0}
+  .mpd-event-text{color:#7a9ab8;line-height:1.4;flex:1}
+  .mpd-event-text b{color:#c8d0dc;font-weight:600}
+  .tab-row{display:flex;gap:0;margin-bottom:12px;border-bottom:1px solid #1e2a38}
+  .tab{font-size:11px;color:#4a6070;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;border-bottom:2px solid transparent;transition:all .2s}
+  .tab:hover{color:#7a9ab8}
+  .tab.active{color:#5bc4f0;border-bottom-color:#5bc4f0}
+</style>
+
+<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Match Performance Dashboard showing xG, progressive carries, player stats, and match phases for an ongoing football match</h2>
+
+<div class="mpd">
+
+  <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding:8px 16px;margin-bottom:14px;background:#0d1520;border:1px solid #2e7daf;border-radius:7px;border-left:3px solid #5bc4f0;">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#4a6070;letter-spacing:2px;text-transform:uppercase;">Created by</span>
+    <span style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#5bc4f0;letter-spacing:1.5px;">Engr. Wasif Hussain Sherwani</span>
+    <span style="width:1px;height:16px;background:#2e7daf;flex-shrink:0;"></span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#7a9ab8;letter-spacing:1px;">⚽ Football Data Scientist</span>
+  </div>
+
+  <div class="mpd-header">
+    <div class="mpd-logo">
+      <div class="mpd-badge">MP</div>
+      <div class="mpd-title">Match Analytics</div>
+    </div>
+    <div class="mpd-live"><div class="mpd-dot" style="background:#e8a020"></div><span style="color:#e8a020">FULL TIME — AFC ASIAN CUP QUALIFIERS</span></div>
+  </div>
+
+  <div class="mpd-score-bar">
+    <div class="mpd-team">
+      <div class="mpd-team-name">Pakistan 🇵🇰</div>
+      <div class="mpd-team-score" id="scoreHome">1</div>
+    </div>
+    <div class="mpd-match-info">
+      <div class="mpd-match-min" id="matchMin" style="color:#e8a020;font-size:18px">FT</div>
+      <div class="mpd-match-label">AFC Asian Cup Qualifiers · Group E · MD6</div>
+      <div class="mpd-match-name">Jinnah Stadium, Islamabad · 31 Mar 2026</div>
+    </div>
+    <div class="mpd-team">
+      <div class="mpd-team-name">Myanmar 🇲🇲</div>
+      <div class="mpd-team-score" id="scoreAway">2</div>
+    </div>
+  </div>
+
+  <div class="mpd-filters">
+    <span class="mpd-filter-label">Filter ›</span>
+    <select class="mpd-select" id="playerFilter" onchange="applyFilter()">
+      <option value="all">All Players</option>
+      <option value="alamgir ghazi">Alamgir Ghazi #10</option>
+      <option value="shayak dost">Shayak Dost #11</option>
+      <option value="ali uzair">Ali Uzair #17</option>
+      <option value="junaid shah">Junaid Shah #8</option>
+      <option value="waqar ihtisham">Waqar Ihtisham #6</option>
+    </select>
+    <select class="mpd-select" id="phaseFilter" onchange="applyFilter()">
+      <option value="all">All Phases</option>
+      <option value="build">Build-up</option>
+      <option value="transition">Transition</option>
+      <option value="attack">Final Third</option>
+      <option value="press">High Press</option>
+    </select>
+    <select class="mpd-select" id="halfFilter" onchange="applyFilter()">
+      <option value="full">Full Match</option>
+      <option value="first">1st Half</option>
+      <option value="second">2nd Half</option>
+    </select>
+    <button class="mpd-btn active" id="btnHome" onclick="toggleTeam('home')">Pakistan</button>
+    <button class="mpd-btn" id="btnAway" onclick="toggleTeam('away')">Myanmar</button>
+  </div>
+
+  <div class="mpd-kpi-row">
+    <div class="mpd-kpi xg">
+      <div class="mpd-kpi-label">xG</div>
+      <div class="mpd-kpi-val" id="kpiXG">1.84</div>
+      <div class="mpd-kpi-sub" id="kpiXGSub">vs 0.72 opp</div>
+      <div class="mpd-callout up" id="calloutXG">+156% xG ratio</div>
+    </div>
+    <div class="mpd-kpi carries">
+      <div class="mpd-kpi-label">Prog. Carries</div>
+      <div class="mpd-kpi-val" id="kpiCarries">34</div>
+      <div class="mpd-kpi-sub" id="kpiCarriesSub">into final third</div>
+      <div class="mpd-callout up" id="calloutCarries">↑ 22% vs avg</div>
+    </div>
+    <div class="mpd-kpi shots">
+      <div class="mpd-kpi-label">Shots on Target</div>
+      <div class="mpd-kpi-val" id="kpiShots">8</div>
+      <div class="mpd-kpi-sub" id="kpiShotsSub">of 13 total</div>
+      <div class="mpd-callout warn" id="calloutShots">61.5% on target</div>
+    </div>
+    <div class="mpd-kpi pressure">
+      <div class="mpd-kpi-label">PPDA</div>
+      <div class="mpd-kpi-val" id="kpiPPDA">6.2</div>
+      <div class="mpd-kpi-sub" id="kpiPPDASub">passes allowed/def act</div>
+      <div class="mpd-callout up" id="calloutPPDA">Elite press</div>
+    </div>
+  </div>
+
+  <div class="mpd-grid">
+    <div class="mpd-card">
+      <div class="mpd-card-title"><span class="mpd-card-dot dot-blue"></span>xG Timeline</div>
+      <div class="tab-row">
+        <div class="tab active" onclick="switchXGTab(this,'cumulative')">Cumulative</div>
+        <div class="tab" onclick="switchXGTab(this,'per-shot')">Per Shot</div>
+      </div>
+      <div class="mpd-xg-chart"><canvas id="xgChart" role="img" aria-label="xG timeline chart — Pakistan 0.68 xG vs Myanmar 1.45 xG over 90 minutes">xG data: Pakistan 0.68, Myanmar 1.45</canvas></div>
+      <div class="mpd-highlight-callout">
+        <div class="mpd-hc-val" id="hcXGVal">0.68</div>
+        <div class="mpd-hc-text">Pakistan created chances but lacked clinical finishing — <b>Shayak Dost</b> scored the 90' consolation header. Myanmar's <b>xG dominance of 1.45</b> tells the full story.</div>
+      </div>
+    </div>
+
+    <div class="mpd-card">
+      <div class="mpd-card-title"><span class="mpd-card-dot dot-green"></span>Player Ratings</div>
+      <div class="mpd-player-list" id="playerList"></div>
+    </div>
+  </div>
+
+  <div class="mpd-bottom">
+    <div class="mpd-card">
+      <div class="mpd-card-title"><span class="mpd-card-dot dot-green"></span>Progressive Carries</div>
+      <div class="mpd-pitch" id="pitchWrap">
+        <canvas class="mpd-carries-canvas" id="pitchCanvas" role="img" aria-label="Pitch map showing progressive carry paths by Pakistan players">Progressive carry paths</canvas>
+      </div>
+      <div class="mpd-highlight-callout" style="margin-top:8px">
+        <div class="mpd-hc-val" style="color:#4ecb8a">21</div>
+        <div class="mpd-hc-text"><b>Alamgir Ghazi & Ali Uzair</b> led Pakistan's carry attempts into Myanmar's half. Central channel was primary route.</div>
+      </div>
+    </div>
+
+    <div class="mpd-card">
+      <div class="mpd-card-title"><span class="mpd-card-dot dot-amber"></span>Phase Distribution</div>
+      <div class="mpd-phase-grid" id="phaseGrid"></div>
+      <div style="height:80px;margin-top:10px"><canvas id="momentumChart" role="img" aria-label="Momentum chart showing Myanmar dominant in second half">Momentum bar</canvas></div>
+      <div class="mpd-highlight-callout" style="margin-top:8px;border-color:#7a3a00;border-left-color:#e8a020;background:#1a1200">
+        <div class="mpd-hc-val" style="color:#e8a020">58%</div>
+        <div class="mpd-hc-text">Myanmar controlled <b>possession in 2nd half</b> — Pakistan reduced to 10 men after Junaid Shah's injury (80')</div>
+      </div>
+    </div>
+
+    <div class="mpd-card">
+      <div class="mpd-card-title"><span class="mpd-card-dot dot-pink"></span>Key Events</div>
+      <div class="mpd-events" id="eventsList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DATA = {
+  home:{
+    players:[
+      {num:'10',name:'Alamgir Ghazi',pos:'CAM',rating:7.0,carries:7,xg:0.28,color:'#5bc4f0'},
+      {num:'11',name:'Shayak Dost',pos:'ST',rating:7.2,carries:8,xg:0.22,color:'#4ecb8a'},
+      {num:'17',name:'Ali Uzair',pos:'RW',rating:6.8,carries:6,xg:0.10,color:'#5bc4f0'},
+      {num:'8',name:'Junaid Shah',pos:'CM',rating:6.5,carries:4,xg:0.05,color:'#e8a020'},
+      {num:'6',name:'Waqar Ihtisham',pos:'CDM',rating:6.2,carries:3,xg:0.03,color:'#4ecb8a'},
+    ],
+    xg:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.10,0.10,0.10,0.10,0.10,0.18,0.18,0.18,0.18,0.18,0.24,0.24,0.24,0.24,0.24,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.54],
+    oppxg:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45],
+    phases:[
+      {name:'Build-up',val:38,max:55,color:'#2e7daf'},
+      {name:'Transition',val:22,max:55,color:'#4ecb8a'},
+      {name:'Final Third',val:18,max:55,color:'#e8a020'},
+      {name:'High Press',val:12,max:55,color:'#d45080'},
+      {name:'Def. Shape',val:42,max:55,color:'#5bc4f0'},
+    ],
+    kpi:{xg:'0.68',xgSub:'vs 1.45 Myanmar xG',xgCallout:'xG deficit −0.77',carries:'21',carriesSub:'into final third',carriesCallout:'Struggled to penetrate',shots:'3',shotsSub:'of 7 total shots',shotsCallout:'42.8% on target',ppda:'14.2',ppdaSub:'passes per def. action',ppdaCallout:'Low press intensity'},
+    events:[
+      {min:'20\'',icon:'🎯',text:'<b>Alamgir Ghazi</b> long-range effort — fine save by Zin Nyi Nyi Aung (xG 0.10)'},
+      {min:'25\'',icon:'🎯',text:'<b>Ali Uzair</b> header across goal — Shayak Dost couldn\'t convert (xG 0.08)'},
+      {min:'HT',icon:'⏱',text:'Goalless at half time — Pakistan competitive but unable to break through'},
+      {min:'46\'',icon:'⚽',text:'<b>Myanmar 1-0</b> — GK Saqib Hanif error on back pass gifted Myanmar the lead'},
+      {min:'60\'',icon:'⚽',text:'<b>Myanmar 2-0</b> — Than Paing breaks offside trap, converts low cross from right'},
+      {min:'75\'',icon:'🛡',text:'<b>Myat Kaung Khant</b> one-on-one — shot wide! Huge miss for Myanmar (xG 0.72)'},
+      {min:'80\'',icon:'🔴',text:'<b>Junaid Shah</b> forced off injured — Pakistan down to 10 men (all subs used)'},
+      {min:'90\'',icon:'⚽',text:'<b>Shayak Dost</b> headed consolation — Ali Agha cross from left. FT: PAK 1–2 MYA'},
+    ]
+  },
+  away:{
+    players:[
+      {num:'9',name:'Than Paing',pos:'ST',rating:8.2,carries:9,xg:0.38,color:'#5bc4f0'},
+      {num:'7',name:'Myat Kaung Khant',pos:'RW',rating:7.5,carries:10,xg:0.72,color:'#d45080'},
+      {num:'10',name:'Nanda Kyaw',pos:'CAM',rating:7.3,carries:7,xg:0.20,color:'#4ecb8a'},
+      {num:'14',name:'Wai Linn Aung',pos:'CM',rating:7.0,carries:5,xg:0.10,color:'#5bc4f0'},
+      {num:'11',name:'Zaw Win Thein',pos:'LW',rating:6.9,carries:6,xg:0.05,color:'#e8a020'},
+    ],
+    xg:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.35,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,0.73,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45,1.45],
+    oppxg:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.10,0.10,0.10,0.10,0.10,0.18,0.18,0.18,0.18,0.18,0.24,0.24,0.24,0.24,0.24,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.30,0.54],
+    phases:[
+      {name:'Build-up',val:42,max:55,color:'#2e7daf'},
+      {name:'Transition',val:30,max:55,color:'#4ecb8a'},
+      {name:'Final Third',val:28,max:55,color:'#e8a020'},
+      {name:'High Press',val:20,max:55,color:'#d45080'},
+      {name:'Def. Shape',val:22,max:55,color:'#5bc4f0'},
+    ],
+    kpi:{xg:'1.45',xgSub:'vs 0.68 Pakistan xG',xgCallout:'+0.77 xG advantage',carries:'28',carriesSub:'into final third',carriesCallout:'↑ Counter-attack dominant',shots:'5',shotsSub:'of 8 total shots',shotsCallout:'62.5% on target',ppda:'8.4',ppdaSub:'passes per def. action',ppdaCallout:'Active press — Group 2nd'},
+    events:[
+      {min:'20\'',icon:'🛡',text:'GK <b>Zin Nyi Nyi Aung</b> saves Ghazi long-range effort — keeps it goalless'},
+      {min:'30\'',icon:'🟡',text:'Pakistan yellow card — cynical foul to halt Myanmar transition'},
+      {min:'HT',icon:'⏱',text:'Myanmar tactically disciplined — 0-0 at break despite Pakistani errors'},
+      {min:'46\'',icon:'⚽',text:'<b>Myanmar 1-0</b> — Pakistani GK Saqib Hanif fails to hold back pass'},
+      {min:'60\'',icon:'⚽',text:'<b>Than Paing</b> — clinical finish after breaking offside trap (xG 0.38)'},
+      {min:'75\'',icon:'🎯',text:'<b>Myat Kaung Khant</b> one-on-one — shot wide! Should have been 3-0 (xG 0.72)'},
+      {min:'80\'',icon:'🔴',text:'Pakistan down to 10 men — Junaid Shah off injured, no subs remaining'},
+      {min:'90\'',icon:'⚽',text:'Shayak Dost consolation header — Myanmar hold firm. FT: MYA 2–1 PAK'},
+    ]
+  }
+};
+
+let currentTeam='home';
+let xgChartInst=null, momentumInst=null, xgMode='cumulative';
+
+function applyFilter(){renderAll()}
+function toggleTeam(t){
+  currentTeam=t;
+  document.getElementById('btnHome').classList.toggle('active',t==='home');
+  document.getElementById('btnAway').classList.toggle('active',t==='away');
+  renderAll();
+}
+
+function renderAll(){
+  const d=DATA[currentTeam];
+  const p=document.getElementById('playerFilter').value;
+  renderKPI(d,p);
+  renderPlayers(d,p);
+  renderPhases(d);
+  renderXGChart(d);
+  renderPitch(d,p);
+  renderEvents(d);
+}
+
+function renderKPI(d,p){
+  let k=d.kpi;
+  if(p!=='all'){
+    const pl=d.players.find(x=>x.name.toLowerCase()===p.toLowerCase());
+    if(pl){
+      document.getElementById('kpiXG').textContent=pl.xg.toFixed(2);
+      document.getElementById('kpiXGSub').textContent='xG for '+pl.name;
+      document.getElementById('calloutXG').textContent='Individual xG';
+      document.getElementById('kpiCarries').textContent=pl.carries;
+      document.getElementById('kpiCarriesSub').textContent='prog. carries';
+      document.getElementById('calloutCarries').textContent='Player total';
+      return;
+    }
+  }
+  document.getElementById('kpiXG').textContent=k.xg;
+  document.getElementById('kpiXGSub').textContent=k.xgSub;
+  document.getElementById('calloutXG').textContent=k.xgCallout;
+  document.getElementById('kpiCarries').textContent=k.carries;
+  document.getElementById('kpiCarriesSub').textContent=k.carriesSub;
+  document.getElementById('calloutCarries').textContent=k.carriesCallout;
+  document.getElementById('kpiShots').textContent=k.shots;
+  document.getElementById('kpiShotsSub').textContent=k.shotsSub;
+  document.getElementById('calloutShots').textContent=k.shotsCallout;
+  document.getElementById('kpiPPDA').textContent=k.ppda;
+  document.getElementById('kpiPPDASub').textContent=k.ppdaSub;
+  document.getElementById('calloutPPDA').textContent=k.ppdaCallout;
+}
+
+function renderPlayers(d,sel){
+  const maxCarries=Math.max(...d.players.map(p=>p.carries));
+  const list=document.getElementById('playerList');
+  list.innerHTML=d.players.map(p=>`
+    <div class="mpd-player-row${p.name.toLowerCase()===sel.toLowerCase()?' selected':''}" onclick="selectPlayer('${p.name.toLowerCase()}')">
+      <div class="mpd-player-num">${p.num}</div>
+      <div class="mpd-player-name">${p.name}</div>
+      <div class="mpd-player-pos">${p.pos}</div>
+      <div class="mpd-player-bar-wrap"><div class="mpd-player-bar" style="width:${(p.carries/maxCarries*100).toFixed(0)}%;background:${p.color}"></div></div>
+      <div class="mpd-player-stat" style="color:${p.color}">${p.rating.toFixed(1)}</div>
+    </div>`).join('');
+}
+
+function selectPlayer(name){
+  document.getElementById('playerFilter').value=name;
+  applyFilter();
+}
+
+function renderPhases(d){
+  const grid=document.getElementById('phaseGrid');
+  grid.innerHTML=d.phases.map(ph=>`
+    <div class="mpd-phase-row">
+      <div class="mpd-phase-name">${ph.name}</div>
+      <div class="mpd-phase-track"><div class="mpd-phase-fill" style="width:${(ph.val/ph.max*100).toFixed(0)}%;background:${ph.color}"></div></div>
+      <div class="mpd-phase-val">${ph.val}%</div>
+    </div>`).join('');
+  renderMomentum(d);
+}
+
+function renderMomentum(d){
+  const ctx=document.getElementById('momentumChart');
+  const bins=Array.from({length:14},(_,i)=>i*5+2);
+  const homeData=bins.map(m=>Math.random()*60+20);
+  const awayData=bins.map(m=>100-homeData[bins.indexOf(m)]);
+  if(momentumInst){momentumInst.destroy()}
+  momentumInst=new Chart(ctx,{
+    type:'bar',
+    data:{labels:bins.map(m=>m+"'"),datasets:[
+      {label:'Pakistan',data:homeData.map(v=>v.toFixed(1)),backgroundColor:'#1a4a7a',borderColor:'#2e7daf',borderWidth:1},
+      {label:'Man City',data:awayData.map(v=>(-v).toFixed(1)),backgroundColor:'#1a3a1a',borderColor:'#3a7a3a',borderWidth:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},
+      scales:{x:{ticks:{color:'#3a5a70',font:{size:8}},grid:{color:'#1e2a38'},stacked:false},
+        y:{ticks:{display:false},grid:{display:false},min:-100,max:100}},
+      animation:{duration:400}}
+  });
+}
+
+function renderXGChart(d){
+  const mins=Array.from({length:91},(_,i)=>i);
+  const ctx=document.getElementById('xgChart');
+  if(xgChartInst){xgChartInst.destroy()}
+  const teamName=currentTeam==='home'?'Pakistan':'Myanmar';
+  const oppName=currentTeam==='home'?'Myanmar':'Pakistan';
+  xgChartInst=new Chart(ctx,{
+    type:'line',
+    data:{labels:mins,datasets:[
+      {label:teamName,data:d.xg,borderColor:'#5bc4f0',backgroundColor:'rgba(91,196,240,.08)',tension:.4,pointRadius:0,borderWidth:2,fill:true},
+      {label:oppName,data:d.oppxg,borderColor:'#d45080',backgroundColor:'rgba(212,80,128,.05)',tension:.4,pointRadius:0,borderWidth:2,fill:true}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'#0d1520',borderColor:'#1e2a38',borderWidth:1,titleColor:'#7a9ab8',bodyColor:'#c8d0dc',titleFont:{family:"'JetBrains Mono'"},callbacks:{label:ctx=>`${ctx.dataset.label}: ${parseFloat(ctx.raw).toFixed(2)} xG`}}},
+      scales:{
+        x:{ticks:{color:'#3a5a70',font:{size:9},maxTicksLimit:10},grid:{color:'rgba(30,42,56,.5)'},title:{display:true,text:'minute',color:'#3a5a70',font:{size:10}}},
+        y:{ticks:{color:'#3a5a70',font:{size:9},callback:v=>v.toFixed(2)},grid:{color:'rgba(30,42,56,.5)'},title:{display:true,text:'xG',color:'#3a5a70',font:{size:10}},min:0}
+      },animation:{duration:400}}
+  });
+}
+
+function switchXGTab(el,mode){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  xgMode=mode;
+  renderXGChart(DATA[currentTeam]);
+}
+
+function renderPitch(d,sel){
+  const canvas=document.getElementById('pitchCanvas');
+  const wrap=document.getElementById('pitchWrap');
+  canvas.width=wrap.clientWidth||320;
+  canvas.height=wrap.clientHeight||200;
+  const c=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  c.clearRect(0,0,W,H);
+  c.strokeStyle='rgba(80,140,80,.25)';c.lineWidth=1;
+  c.strokeRect(4,4,W-8,H-8);
+  c.beginPath();c.moveTo(W/2,4);c.lineTo(W/2,H-4);c.stroke();
+  c.beginPath();c.arc(W/2,H/2,H*.18,0,Math.PI*2);c.stroke();
+  c.strokeRect(W*.75,H*.25,W*.24,H*.5);
+  c.strokeRect(W*.87,H*.35,W*.12,H*.3);
+  const carries=[
+    {x1:.30,y1:.65,x2:.55,y2:.45,name:'Alamgir Ghazi',col:'#5bc4f0',w:2.5},
+    {x1:.32,y1:.45,x2:.58,y2:.30,name:'Alamgir Ghazi',col:'#5bc4f0',w:2.5},
+    {x1:.28,y1:.55,x2:.52,y2:.38,name:'Alamgir Ghazi',col:'#5bc4f0',w:2.0},
+    {x1:.35,y1:.70,x2:.60,y2:.50,name:'Shayak Dost',col:'#4ecb8a',w:2.5},
+    {x1:.38,y1:.50,x2:.62,y2:.32,name:'Shayak Dost',col:'#4ecb8a',w:2.0},
+    {x1:.33,y1:.38,x2:.58,y2:.22,name:'Shayak Dost',col:'#4ecb8a',w:2.0},
+    {x1:.40,y1:.60,x2:.63,y2:.42,name:'Ali Uzair',col:'#5bc4f0',w:1.5},
+    {x1:.38,y1:.40,x2:.62,y2:.28,name:'Ali Uzair',col:'#5bc4f0',w:1.5},
+    {x1:.25,y1:.50,x2:.48,y2:.52,name:'Waqar Ihtisham',col:'#7a9ab8',w:1.0},
+  ];
+  carries.forEach(carry=>{
+    const show=sel==='all'||(sel&&carry.name.toLowerCase()===sel.toLowerCase());
+    if(!show)return;
+    const x1=carry.x1*W,y1=carry.y1*H,x2=carry.x2*W,y2=carry.y2*H;
+    c.beginPath();
+    c.moveTo(x1,y1);
+    const cx=(x1+x2)/2,cy=(y1+y2)/2-18;
+    c.quadraticCurveTo(cx,cy,x2,y2);
+    c.strokeStyle=carry.col;c.lineWidth=carry.w;c.globalAlpha=.75;
+    c.stroke();
+    const angle=Math.atan2(y2-cy,x2-cx);
+    c.save();c.translate(x2,y2);c.rotate(angle);
+    c.beginPath();c.moveTo(-6,-3);c.lineTo(0,0);c.lineTo(-6,3);
+    c.strokeStyle=carry.col;c.lineWidth=carry.w;c.stroke();c.restore();
+    c.globalAlpha=1;
+  });
+}
+
+function renderEvents(d){
+  const list=document.getElementById('eventsList');
+  list.innerHTML=d.events.map(e=>`<div class="mpd-event"><div class="mpd-event-min">${e.min}</div><div class="mpd-event-icon">${e.icon}</div><div class="mpd-event-text">${e.text}</div></div>`).join('');
+}
+
+window.addEventListener('load',()=>{setTimeout(()=>{renderAll()},100)});
+</script>
